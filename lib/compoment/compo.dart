@@ -4,12 +4,11 @@ class Compo {
   Widget test(
       {String? text, required BuildContext context, required Widget wid}) {
     Size size = MediaQuery.of(context).size;
-    EdgeInsets media = MediaQuery.of(context).viewPadding;
     return Column(
       children: [
         (text != null)
             ? Container(
-                padding: EdgeInsets.fromLTRB(15, 15, 0, media.bottom),
+                padding: const EdgeInsets.fromLTRB(15, 15, 0, 15),
                 width: size.width,
                 child: Text(
                   text,

@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:diversition_test/pages/confrimpayment.dart';
 import 'package:flutter/material.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
@@ -15,27 +14,23 @@ import 'package:http/http.dart' as http;
 
 class Page2 extends StatefulWidget {
   final Product product;
+  final Function onLoad;
+  final Function nevPage;
+  final Function dialogFail;
 
-  const Page2({Key? key, required this.product}) : super(key: key);
+  const Page2(
+      {Key? key,
+      required this.product,
+      required this.onLoad,
+      required this.nevPage,
+      required this.dialogFail})
+      : super(key: key);
 
   @override
   State<Page2> createState() => _Page1();
 }
 
 class _Page1 extends State<Page2> {
-  final TextEditingController _controllerFullName = TextEditingController();
-  final TextEditingController _controllerCardID = TextEditingController();
-  final TextEditingController _controllerMonth = TextEditingController();
-  final TextEditingController _controllerYear = TextEditingController();
-  final TextEditingController _controllerCVC = TextEditingController();
-
-  bool _isDisable = false;
-  bool isValidateName = false;
-  bool isValidateCard = false;
-  bool isValidateMonth = false;
-  bool isValidateYear = false;
-  bool isValidateCVC = false;
-
   String sumStr = '0';
 
   /// Get your public key on Omise Dashboard
@@ -92,67 +87,49 @@ class _Page1 extends State<Page2> {
     ).catchError((value) {
       isSuscess = false;
       print(value);
+      widget.dialogFail();
     });
-    ;
+
     return isSuscess;
   }
 
-  validate() {
-    isValidateName = _controllerFullName.text == '' ? true : false;
-    isValidateCard = _controllerCardID.text == '' ? true : false;
-    isValidateMonth = _controllerMonth.text == '' ? true : false;
-    isValidateYear = _controllerYear.text == '' ? true : false;
-    isValidateCVC = _controllerCVC.text == '' ? true : false;
-    return !(isValidateName ||
-        isValidateCard ||
-        isValidateMonth ||
-        isValidateYear ||
-        isValidateCVC);
-  }
-
   confrim() async {
-    _isDisable = true;
-    setState(() {});
-    if (/*validate() && */ await getTokenAndChargeOmise()) {
-      await Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: ((context) => ConfrimPayment(product: widget.product)),
-          ),
-          (route) => false);
+    widget.onLoad(true);
+    if (await getTokenAndChargeOmise()) {
+      widget.nevPage();
     }
-    _isDisable = false;
-    setState(() {});
   }
 
   dialogConfrim() async {
     return await Dialogs.materialDialog(
-        title: "ยืนยัน",
-        msg: 'ใช้ Bank ในการชำระเงิน',
-        color: Colors.white,
-        context: context,
-        actions: [
-          IconsOutlineButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            text: 'ยกเลิก',
-            iconData: Icons.cancel_outlined,
-            textStyle: const TextStyle(color: Colors.grey),
-            iconColor: Colors.grey,
-          ),
-          IconsButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              confrim();
-            },
-            text: 'ยืนยัน',
-            iconData: Icons.check_circle,
-            color: Colors.green,
-            textStyle: const TextStyle(color: Colors.white),
-            iconColor: Colors.white,
-          ),
-        ]);
+      barrierDismissible: false,
+      title: "ยืนยัน",
+      msg: 'ใช้ Bank ในการชำระเงิน',
+      color: Colors.white,
+      context: context,
+      actions: [
+        IconsOutlineButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          text: 'ยกเลิก',
+          iconData: Icons.cancel_outlined,
+          textStyle: const TextStyle(color: Colors.grey),
+          iconColor: Colors.grey,
+        ),
+        IconsButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            confrim();
+          },
+          text: 'ยืนยัน',
+          iconData: Icons.check_circle,
+          color: Colors.green,
+          textStyle: const TextStyle(color: Colors.white),
+          iconColor: Colors.white,
+        ),
+      ],
+    );
   }
 
   backPage() {
@@ -217,6 +194,7 @@ class _Page1 extends State<Page2> {
                       'ยอดชำระ : $sumStr บาท',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -236,7 +214,7 @@ class _Page1 extends State<Page2> {
               width: size.width,
               child: ElevatedButton(
                 child: const Text('ยืนยัน'),
-                onPressed: () => _isDisable ? null : dialogConfrim(),
+                onPressed: () => dialogConfrim(),
               ),
             ),
           ),

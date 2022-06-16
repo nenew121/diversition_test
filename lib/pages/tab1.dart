@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:diversition_test/pages/confrimpayment.dart';
 import 'package:flutter/material.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
@@ -8,14 +7,24 @@ import 'package:material_dialogs/widgets/buttons/icon_outline_button.dart';
 import 'package:omise_flutter/omise_flutter.dart';
 
 import '../compoment/compo.dart';
+import '../models/credit.dart';
 import '../models/product.dart';
 
 import 'package:http/http.dart' as http;
 
 class Page1 extends StatefulWidget {
   final Product product;
+  final Function onLoad;
+  final Function nevPage;
+  final Function dialogFail;
 
-  const Page1({Key? key, required this.product}) : super(key: key);
+  const Page1(
+      {Key? key,
+      required this.product,
+      required this.onLoad,
+      required this.nevPage,
+      required this.dialogFail})
+      : super(key: key);
 
   @override
   State<Page1> createState() => _Page1();
@@ -28,7 +37,6 @@ class _Page1 extends State<Page1> {
   final TextEditingController _controllerYear = TextEditingController();
   final TextEditingController _controllerCVC = TextEditingController();
 
-  bool _isDisable = false;
   bool isValidateName = false;
   bool isValidateCard = false;
   bool isValidateMonth = false;
@@ -37,6 +45,8 @@ class _Page1 extends State<Page1> {
 
   String sumStr = '0';
 
+  Credit credit = Credit();
+
   /// Get your public key on Omise Dashboard
   static const publicKey = "pkey_test_5s52k7h4ybker66gcxi";
   OmiseFlutter omise = OmiseFlutter(publicKey);
@@ -44,11 +54,18 @@ class _Page1 extends State<Page1> {
   @override
   void initState() {
     super.initState();
-    _controllerFullName.text = 'ชื่อทดสอบ นามสกุลทดสอบ';
-    _controllerCardID.text = '4242424242424242';
-    _controllerMonth.text = '9';
-    _controllerYear.text = '2022';
-    _controllerCVC.text = '123';
+
+    // credit.fullName = 'ชื่อทดสอบ นามสกุลทดสอบ';
+    // credit.cardID = 4242424242424242;
+    // credit.month = 9;
+    // credit.year = 2022;
+    // credit.cvc = 123;
+
+    // _controllerFullName.text = credit.fullName!;
+    // _controllerCardID.text = credit.cardID.toString();
+    // _controllerMonth.text = credit.month.toString();
+    // _controllerYear.text = credit.year.toString();
+    // _controllerCVC.text = credit.cvc.toString();
 
     sumStr = ((widget.product.amount! * widget.product.num!) / 100).toString();
   }
@@ -98,6 +115,8 @@ class _Page1 extends State<Page1> {
     ).catchError((value) {
       isSuscess = false;
       print(value);
+      widget.onLoad(false);
+      widget.dialogFail();
     });
     return isSuscess;
   }
@@ -108,6 +127,7 @@ class _Page1 extends State<Page1> {
     isValidateMonth = _controllerMonth.text == '' ? true : false;
     isValidateYear = _controllerYear.text == '' ? true : false;
     isValidateCVC = _controllerCVC.text == '' ? true : false;
+    setState(() {});
     return !(isValidateName ||
         isValidateCard ||
         isValidateMonth ||
@@ -116,48 +136,42 @@ class _Page1 extends State<Page1> {
   }
 
   confrim() async {
-    _isDisable = true;
-    setState(() {});
-    if (validate() && await getTokenAndChargeOmise()) {
-      await Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: ((context) => ConfrimPayment(product: widget.product)),
-          ),
-          (route) => false);
+    widget.onLoad(true);
+    if (await getTokenAndChargeOmise()) {
+      widget.nevPage();
     }
-    _isDisable = false;
-    setState(() {});
   }
 
   dialogConfrim() async {
     return await Dialogs.materialDialog(
-        title: "ยืนยัน",
-        msg: 'ใช้ Credit ในการชำระเงิน',
-        color: Colors.white,
-        context: context,
-        actions: [
-          IconsOutlineButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            text: 'ยกเลิก',
-            iconData: Icons.cancel_outlined,
-            textStyle: const TextStyle(color: Colors.grey),
-            iconColor: Colors.grey,
-          ),
-          IconsButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              confrim();
-            },
-            text: 'ยืนยัน',
-            iconData: Icons.check_circle,
-            color: Colors.green,
-            textStyle: const TextStyle(color: Colors.white),
-            iconColor: Colors.white,
-          ),
-        ]);
+      barrierDismissible: false,
+      title: "ยืนยัน",
+      msg: 'ใช้ Credit ในการชำระเงิน',
+      color: Colors.white,
+      context: context,
+      actions: [
+        IconsOutlineButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          text: 'ยกเลิก',
+          iconData: Icons.cancel_outlined,
+          textStyle: const TextStyle(color: Colors.grey),
+          iconColor: Colors.grey,
+        ),
+        IconsButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            confrim();
+          },
+          text: 'ยืนยัน',
+          iconData: Icons.check_circle,
+          color: Colors.green,
+          textStyle: const TextStyle(color: Colors.white),
+          iconColor: Colors.white,
+        ),
+      ],
+    );
   }
 
   backPage() {
@@ -201,8 +215,7 @@ class _Page1 extends State<Page1> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+  body() {
     Size size = MediaQuery.of(context).size;
     EdgeInsets media = MediaQuery.of(context).viewPadding;
     return Stack(
@@ -284,12 +297,17 @@ class _Page1 extends State<Page1> {
               width: size.width,
               child: ElevatedButton(
                 child: const Text('ยืนยัน'),
-                onPressed: () => _isDisable ? null : dialogConfrim(),
+                onPressed: () => validate() ? dialogConfrim() : null,
               ),
             ),
           ),
         ),
       ],
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return body();
   }
 }

@@ -6,6 +6,7 @@ class Body {
     required BuildContext context,
     required Widget body,
     Widget? bottomNavigationBar,
+    bool isLoading = false,
   }) {
     Size size = MediaQuery.of(context).size;
     EdgeInsets media = MediaQuery.of(context).viewPadding;

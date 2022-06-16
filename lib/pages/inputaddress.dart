@@ -34,6 +34,22 @@ class _InputAddress extends State<InputAddress> {
   @override
   void initState() {
     super.initState();
+
+    // widget.product.address = 'ที่อยู่ทดสอบ';
+    // widget.product.province = 'จังหวัดทดสอบ';
+    // widget.product.city = 'เขต/อำเภอทดสอบ';
+    // widget.product.district = 'ตำบลทดสอบ';
+    // widget.product.postalCode = '12345';
+    // widget.product.fullName = 'ชื่อทดสอบ นามสกุลทดสอบ';
+    // widget.product.phoneNumber = '0987654321';
+
+    // _controllerAddress.text = widget.product.fullName!;
+    // _controllerProvince.text = widget.product.province!;
+    // _controllerCity.text = widget.product.city!;
+    // _controllerDistrict.text = widget.product.district!;
+    // _controllerCode.text = widget.product.postalCode!;
+    // _controllerFullName.text = widget.product.fullName!;
+    // _controllerNumPhone.text = widget.product.phoneNumber!;
   }
 
   @override
@@ -48,17 +64,22 @@ class _InputAddress extends State<InputAddress> {
   confrim() async {
     _isDisable = true;
     setState(() {});
-    // if (validate()) {
+    if (validate()) {
+    widget.product.address = _controllerAddress.text;
+    widget.product.province = _controllerProvince.text;
     widget.product.city = _controllerCity.text;
+    widget.product.district = _controllerDistrict.text;
     widget.product.postalCode = _controllerCode.text;
+    widget.product.fullName = _controllerFullName.text;
     widget.product.phoneNumber = _controllerNumPhone.text;
+
     await Navigator.push(
       context,
       MaterialPageRoute(
         builder: ((context) => SelectPayment(product: widget.product)),
       ),
     );
-    // }
+    }
     _isDisable = false;
     setState(() {});
   }

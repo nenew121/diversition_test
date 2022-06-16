@@ -58,7 +58,7 @@ class _ConfrimPaymentState extends State<ConfrimPayment> {
                       size: 150,
                       color: Colors.green,
                     ),
-                    Text('ทำรายการสำเร็จ',style: TextStyle(fontSize: 28,color: Colors.green),),
+                    Text('เสร็จสิ้นรายการ',style: TextStyle(fontSize: 28,color: Colors.green),),
                   ],
                 ),
               ),
