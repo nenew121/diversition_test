@@ -1,7 +1,7 @@
-import 'package:diversition_test/pages/mainpage.dart';
+import 'package:diversition_test/pages/list.dart';
 import 'package:flutter/material.dart';
-import '../compoment/bodypage.dart';
-import '../compoment/compo.dart';
+import '../layouts/body.dart';
+import '../layouts/formtext.dart';
 import '../models/product.dart';
 
 class ConfrimPayment extends StatefulWidget {
@@ -32,7 +32,7 @@ class _ConfrimPaymentState extends State<ConfrimPayment> {
     debugPrint('Confrim');
     Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: ((context) => const MainPage())),
+        MaterialPageRoute(builder: ((context) => const ListInfo())),
         (route) => false);
   }
 
@@ -41,9 +41,8 @@ class _ConfrimPaymentState extends State<ConfrimPayment> {
     Size size = MediaQuery.of(context).size;
     EdgeInsets media = MediaQuery.of(context).viewPadding;
 
-    return Body().page(
+    return Body(
       title: 'ชำระเงิน',
-      context: context,
       body: Stack(
         children: [
           SizedBox(
@@ -58,7 +57,10 @@ class _ConfrimPaymentState extends State<ConfrimPayment> {
                       size: 150,
                       color: Colors.green,
                     ),
-                    Text('เสร็จสิ้นรายการ',style: TextStyle(fontSize: 28,color: Colors.green),),
+                    Text(
+                      'เสร็จสิ้นรายการ',
+                      style: TextStyle(fontSize: 28, color: Colors.green),
+                    ),
                   ],
                 ),
               ),
@@ -67,8 +69,8 @@ class _ConfrimPaymentState extends State<ConfrimPayment> {
           // btn
           Positioned(
             bottom: 0,
-            child: Compo().test(
-              context: context,
+            height: 50,
+            child: FormText(
               wid: Container(
                 padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
                 width: size.width,

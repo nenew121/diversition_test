@@ -7,10 +7,12 @@ import 'package:material_dialogs/widgets/buttons/icon_outline_button.dart';
 import 'package:omise_flutter/omise_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../compoment/compo.dart';
+import '../layouts/formtext.dart';
 import '../models/product.dart';
 
 import 'package:http/http.dart' as http;
+
+import '../resources/resources.dart';
 
 class Page2 extends StatefulWidget {
   final Product product;
@@ -41,7 +43,7 @@ class _Page1 extends State<Page2> {
   void initState() {
     super.initState();
 
-    sumStr = ((widget.product.amount! * widget.product.num!) / 100).toString();
+    sumStr = ((widget.product.amount! * widget.product.num!)).toString();
   }
 
   getTokenAndChargeOmise() async {
@@ -52,34 +54,21 @@ class _Page1 extends State<Page2> {
       (value) async {
         print(value.id);
         String sourceID = value.id.toString();
-        String secreKey = 'skey_test_5s52k7ilttrvp6n4owa';
-        String urlAPI = 'https://api.omise.co/charges';
-        String basicAuth = 'Basic ${base64Encode(utf8.encode("$secreKey:"))}';
-
-        Map<String, String> headerMap = {};
-        headerMap['authorization'] = basicAuth;
-        headerMap['Cache-Control'] = 'no-cache';
-        headerMap['Content-Type'] = 'application/x-www-form-urlencoded';
-
         Map<String, dynamic> data = {};
         data['amount'] = amount.toString();
         data['currency'] = currency;
         data['source'] = sourceID;
-        data['return_uri'] = 'http://example.com/orders/345678/complete';
+        data['return_uri'] = 'https://www.google.com/';
 
-        Uri uri = Uri.parse(urlAPI);
-        http.Response reponse = await http.post(
-          uri,
-          headers: headerMap,
-          body: data,
-        );
+        http.Response reponse = await Resources().postCharges(data);
 
         var result = json.decode(reponse.body);
 
         String authorizeURI = result['authorize_uri'];
         print('authorizeURI : $authorizeURI');
 
-        launchUrl(Uri.parse(authorizeURI));
+        launchUrl(Uri.parse(authorizeURI),
+            mode: LaunchMode.externalApplication);
 
         print(result);
         isSuscess = true;
@@ -132,47 +121,6 @@ class _Page1 extends State<Page2> {
     );
   }
 
-  backPage() {
-    Navigator.pop(context);
-  }
-
-  formInput({
-    required TextEditingController controller,
-    required String text,
-    TextInputType type = TextInputType.text,
-    bool isVali = false,
-  }) {
-    return Container(
-      color: Colors.white,
-      child: Stack(
-        children: [
-          controller.text == ''
-              ? Container(
-                  padding: const EdgeInsets.fromLTRB(15, 15, 0, 0),
-                  child: Text(
-                    text,
-                    style: const TextStyle(color: Colors.black38),
-                  ),
-                )
-              : Container(),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-            child: TextField(
-              controller: controller,
-              keyboardType: type,
-              onChanged: (text) => setState(() {}),
-              decoration: InputDecoration(
-                errorText: controller.text == '' && isVali
-                    ? 'กรุณากรอกข้อมูล $text '
-                    : null,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -207,8 +155,8 @@ class _Page1 extends State<Page2> {
         // btn
         Positioned(
           bottom: 0,
-          child: Compo().test(
-            context: context,
+          height: 50,
+          child: FormText(
             wid: Container(
               padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
               width: size.width,

@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
 
-class Compo {
-  Widget test(
-      {String? text, required BuildContext context, required Widget wid}) {
+class FormText extends StatelessWidget {
+  final String? text;
+  final Widget wid;
+
+  const FormText({
+    Key? key,
+    this.text,
+    required this.wid,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
     return Column(
       children: [
         (text != null)
@@ -11,7 +21,7 @@ class Compo {
                 padding: const EdgeInsets.fromLTRB(15, 15, 0, 15),
                 width: size.width,
                 child: Text(
-                  text,
+                  text ?? '',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                   ),

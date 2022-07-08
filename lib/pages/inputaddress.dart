@@ -1,9 +1,10 @@
-import 'package:diversition_test/compoment/bodypage.dart';
-import 'package:diversition_test/pages/selectpayment.dart';
 import 'package:flutter/material.dart';
-import 'package:diversition_test/models/product.dart';
 
-import '../compoment/compo.dart';
+import '../layouts/body.dart';
+import '../layouts/forminput.dart';
+import '../layouts/formtext.dart';
+import '../models/product.dart';
+import 'selectpayment.dart';
 
 class InputAddress extends StatefulWidget {
   final Product product;
@@ -35,21 +36,21 @@ class _InputAddress extends State<InputAddress> {
   void initState() {
     super.initState();
 
-    // widget.product.address = 'ที่อยู่ทดสอบ';
-    // widget.product.province = 'จังหวัดทดสอบ';
-    // widget.product.city = 'เขต/อำเภอทดสอบ';
-    // widget.product.district = 'ตำบลทดสอบ';
-    // widget.product.postalCode = '12345';
-    // widget.product.fullName = 'ชื่อทดสอบ นามสกุลทดสอบ';
-    // widget.product.phoneNumber = '0987654321';
+    widget.product.address = 'ที่อยู่ทดสอบ';
+    widget.product.province = 'จังหวัดทดสอบ';
+    widget.product.city = 'เขต/อำเภอทดสอบ';
+    widget.product.district = 'ตำบลทดสอบ';
+    widget.product.postalCode = '12345';
+    widget.product.fullName = 'ชื่อทดสอบ นามสกุลทดสอบ';
+    widget.product.phoneNumber = '0987654321';
 
-    // _controllerAddress.text = widget.product.fullName!;
-    // _controllerProvince.text = widget.product.province!;
-    // _controllerCity.text = widget.product.city!;
-    // _controllerDistrict.text = widget.product.district!;
-    // _controllerCode.text = widget.product.postalCode!;
-    // _controllerFullName.text = widget.product.fullName!;
-    // _controllerNumPhone.text = widget.product.phoneNumber!;
+    _controllerAddress.text = widget.product.fullName!;
+    _controllerProvince.text = widget.product.province!;
+    _controllerCity.text = widget.product.city!;
+    _controllerDistrict.text = widget.product.district!;
+    _controllerCode.text = widget.product.postalCode!;
+    _controllerFullName.text = widget.product.fullName!;
+    _controllerNumPhone.text = widget.product.phoneNumber!;
   }
 
   @override
@@ -57,68 +58,28 @@ class _InputAddress extends State<InputAddress> {
     super.dispose();
   }
 
-  backPage() {
-    Navigator.pop(context);
-  }
-
   confrim() async {
+    FocusScope.of(context).requestFocus(FocusNode());
     _isDisable = true;
     setState(() {});
     if (validate()) {
-    widget.product.address = _controllerAddress.text;
-    widget.product.province = _controllerProvince.text;
-    widget.product.city = _controllerCity.text;
-    widget.product.district = _controllerDistrict.text;
-    widget.product.postalCode = _controllerCode.text;
-    widget.product.fullName = _controllerFullName.text;
-    widget.product.phoneNumber = _controllerNumPhone.text;
+      widget.product.address = _controllerAddress.text;
+      widget.product.province = _controllerProvince.text;
+      widget.product.city = _controllerCity.text;
+      widget.product.district = _controllerDistrict.text;
+      widget.product.postalCode = _controllerCode.text;
+      widget.product.fullName = _controllerFullName.text;
+      widget.product.phoneNumber = _controllerNumPhone.text;
 
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: ((context) => SelectPayment(product: widget.product)),
-      ),
-    );
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: ((context) => SelectPayment(product: widget.product)),
+        ),
+      );
     }
     _isDisable = false;
     setState(() {});
-  }
-
-  formInput({
-    required TextEditingController controller,
-    required String text,
-    TextInputType type = TextInputType.text,
-    bool isVali = false,
-  }) {
-    return Container(
-      color: Colors.white,
-      child: Stack(
-        children: [
-          controller.text == ''
-              ? Container(
-                  padding: const EdgeInsets.fromLTRB(15, 15, 0, 0),
-                  child: Text(
-                    text,
-                    style: const TextStyle(color: Colors.black38),
-                  ),
-                )
-              : Container(),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-            child: TextField(
-              controller: controller,
-              keyboardType: type,
-              onChanged: (text) => setState(() {}),
-              decoration: InputDecoration(
-                errorText: controller.text == '' && isVali
-                    ? 'กรุณากรอกข้อมูล $text '
-                    : null,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   validate() {
@@ -143,9 +104,10 @@ class _InputAddress extends State<InputAddress> {
     Size size = MediaQuery.of(context).size;
     EdgeInsets media = MediaQuery.of(context).viewPadding;
 
-    return Body().page(
+    return Body(
+      isShowBack: true,
+      isLoading: false,
       title: 'กรอกรายละเอียดการจัดส่ง',
-      context: context,
       body: GestureDetector(
         onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
         behavior: HitTestBehavior.opaque,
@@ -154,84 +116,82 @@ class _InputAddress extends State<InputAddress> {
             SizedBox(
               height: size.height - 150 - media.bottom,
               width: size.width,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    // text ที่อยู่
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(15, 15, 0, 15),
-                      width: size.width,
-                      child: const Text(
-                        'ที่อยู่',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
+              child: Column(
+                children: [
+                  // text ที่อยู่
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(15, 15, 0, 15),
+                    width: size.width,
+                    child: const Text(
+                      'ที่อยู่',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    // รายละเอียดที่อยู่
-                    formInput(
-                      controller: _controllerAddress,
-                      text: 'รายละเอียดที่อยู่',
-                      isVali: isvaliAddress,
-                    ),
-                    // จังหวัด
-                    formInput(
-                      controller: _controllerProvince,
-                      text: 'จังหวัด',
-                      isVali: isvaliProvince,
-                    ),
-                    // เขต/อำเภอ
-                    formInput(
-                      controller: _controllerCity,
-                      text: 'เขต/อำเภอ',
-                      isVali: isvaliCity,
-                    ),
-                    // ตำบล
-                    formInput(
-                      controller: _controllerDistrict,
-                      text: 'ตำบล',
-                      isVali: isvaliDistrict,
-                    ),
-                    // รหัสไปรษณีย์
-                    formInput(
-                      controller: _controllerCode,
-                      text: 'รหัสไปรษณีย์',
-                      type: TextInputType.number,
-                      isVali: isvaliCode,
-                    ),
-                    // text ช่องทางติดต่อ
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(15, 15, 0, 15),
-                      width: size.width,
-                      child: const Text(
-                        'ช่องทางติดต่อ',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
+                  ),
+                  // รายละเอียดที่อยู่
+                  FormInput(
+                    controller: _controllerAddress,
+                    text: 'รายละเอียดที่อยู่',
+                    isVali: isvaliAddress,
+                  ),
+                  // จังหวัด
+                  FormInput(
+                    controller: _controllerProvince,
+                    text: 'จังหวัด',
+                    isVali: isvaliProvince,
+                  ),
+                  // เขต/อำเภอ
+                  FormInput(
+                    controller: _controllerCity,
+                    text: 'เขต/อำเภอ',
+                    isVali: isvaliCity,
+                  ),
+                  // ตำบล
+                  FormInput(
+                    controller: _controllerDistrict,
+                    text: 'ตำบล',
+                    isVali: isvaliDistrict,
+                  ),
+                  // รหัสไปรษณีย์
+                  FormInput(
+                    controller: _controllerCode,
+                    text: 'รหัสไปรษณีย์',
+                    type: TextInputType.number,
+                    isVali: isvaliCode,
+                  ),
+                  // text ช่องทางติดต่อ
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(15, 15, 0, 15),
+                    width: size.width,
+                    child: const Text(
+                      'ช่องทางติดต่อ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    // ชื่อ - นามสกุล
-                    formInput(
-                      controller: _controllerFullName,
-                      text: 'ชื่อ - นามสกุล',
-                      isVali: isvaliFullName,
-                    ),
-                    // หมายเลขโทรศัพท์
-                    formInput(
-                      controller: _controllerNumPhone,
-                      text: 'หมายเลขโทรศัพท์',
-                      type: TextInputType.number,
-                      isVali: isvaliNumPhone,
-                    ),
-                  ],
-                ),
+                  ),
+                  // ชื่อ - นามสกุล
+                  FormInput(
+                    controller: _controllerFullName,
+                    text: 'ชื่อ - นามสกุล',
+                    isVali: isvaliFullName,
+                  ),
+                  // หมายเลขโทรศัพท์
+                  FormInput(
+                    controller: _controllerNumPhone,
+                    text: 'หมายเลขโทรศัพท์',
+                    type: TextInputType.number,
+                    isVali: isvaliNumPhone,
+                  ),
+                ],
               ),
             ),
             // btn
             Positioned(
               bottom: 0,
-              child: Compo().test(
-                context: context,
+              height: 50,
+              child: FormText(
                 wid: Container(
                   padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
                   width: size.width,

@@ -1,12 +1,12 @@
-import 'package:diversition_test/pages/tab1.dart';
-import 'package:diversition_test/pages/tab2.dart';
 import 'package:flutter/material.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
-import '../compoment/bodypage.dart';
-import '../compoment/loading.dart';
+import '../layouts/body.dart';
+import '../layouts/loading.dart';
 import '../models/product.dart';
 import 'confrimpayment.dart';
+import 'tab1.dart';
+import 'tab2.dart';
 
 class SelectPayment extends StatefulWidget {
   final Product product;
@@ -17,30 +17,16 @@ class SelectPayment extends StatefulWidget {
   State<SelectPayment> createState() => _SelectPaymentState();
 }
 
-class _SelectPaymentState extends State<SelectPayment> {
-  List<Widget> widgetOptions = <Widget>[];
-
-  int selectedIndex = 0;
+class _SelectPaymentState extends State<SelectPayment>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
 
   bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    widgetOptions = [
-      Page1(
-        product: widget.product,
-        onLoad: onLoad,
-        nevPage: nevPage,
-        dialogFail: dialogFail,
-      ),
-      Page2(
-        product: widget.product,
-        onLoad: onLoad,
-        nevPage: nevPage,
-        dialogFail: dialogFail,
-      ),
-    ];
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -54,6 +40,7 @@ class _SelectPaymentState extends State<SelectPayment> {
   }
 
   dialogFail() async {
+    onLoad(false);
     return await Dialogs.materialDialog(
       barrierDismissible: false,
       title: "ผิดพลาด",
@@ -77,44 +64,59 @@ class _SelectPaymentState extends State<SelectPayment> {
 
   nevPage() {
     Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: ((context) => ConfrimPayment(product: widget.product)),
-        ),
-        (route) => false);
+      context,
+      MaterialPageRoute(
+        builder: ((context) => ConfrimPayment(product: widget.product)),
+      ),
+      (route) => false,
+    );
   }
 
-  body() {
-    return Body().page(
+  Widget body() {
+    return Body(
+      isShowBack: true,
       title: 'เลือกวิธีชำระเงิน',
-      context: context,
       body: GestureDetector(
         onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
         behavior: HitTestBehavior.opaque,
-        child: widgetOptions[selectedIndex],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.credit_card,
-            ),
-            label: 'Credit',
+        child: DefaultTabController(
+          length: 2,
+          child: Column(
+            children: [
+              Container(
+                color: Colors.white,
+                child: TabBar(
+                  controller: _tabController,
+                  labelColor: Colors.black,
+                  unselectedLabelColor: Colors.black,
+                  tabs: const [
+                    Tab(text: 'Credit'),
+                    Tab(text: 'Bank'),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    Page1(
+                      product: widget.product,
+                      onLoad: onLoad,
+                      nevPage: nevPage,
+                      dialogFail: dialogFail,
+                    ),
+                    Page2(
+                      product: widget.product,
+                      onLoad: onLoad,
+                      nevPage: nevPage,
+                      dialogFail: dialogFail,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.money,
-            ),
-            label: 'Bank',
-          ),
-        ],
-        currentIndex: selectedIndex,
-        selectedItemColor: Colors.black,
-        onTap: ((value) {
-          setState(() {
-            selectedIndex = value;
-          });
-        }),
+        ),
       ),
     );
   }
